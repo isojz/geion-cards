@@ -15,7 +15,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 50px 20px;
+    padding: 50px 20px 80px;
     background: #0f0c29;
     background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
     color: #e8e8f0;
@@ -23,7 +23,6 @@
     overflow-x: hidden;
   }
 
-  /* Ambient floating orbs */
   body::before, body::after {
     content: '';
     position: fixed;
@@ -72,7 +71,6 @@
     z-index: 1;
   }
 
-  /* Glass select */
   .select-container {
     margin-bottom: 40px;
     z-index: 1;
@@ -96,16 +94,9 @@
     background-repeat: no-repeat;
     background-position: right 16px center;
   }
-  select:hover {
-    border-color: rgba(255,255,255,0.3);
-    background: rgba(255,255,255,0.12);
-  }
-  select:focus {
-    border-color: rgba(123,104,238,0.6);
-    box-shadow: 0 0 20px rgba(123,104,238,0.15);
-  }
+  select:hover { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.12); }
+  select:focus { border-color: rgba(123,104,238,0.6); box-shadow: 0 0 20px rgba(123,104,238,0.15); }
 
-  /* Glass card */
   #cardArea {
     width: 100%;
     max-width: 640px;
@@ -118,17 +109,12 @@
     -webkit-backdrop-filter: blur(24px);
     border: 1px solid rgba(255,255,255,0.1);
     border-radius: 16px;
-    padding: 36px;
-    line-height: 2;
-    font-size: 0.92rem;
-    font-weight: 300;
+    overflow: hidden;
     opacity: 0;
     transform: translateY(16px) scale(0.98);
     transition: opacity 0.5s ease, transform 0.5s ease;
-    white-space: pre-wrap;
     box-shadow: 0 8px 32px rgba(0,0,0,0.3);
     position: relative;
-    overflow: hidden;
   }
 
   .card::before {
@@ -137,6 +123,7 @@
     top: 0; left: 0; right: 0;
     height: 1px;
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    z-index: 2;
   }
 
   .card.show {
@@ -144,7 +131,42 @@
     transform: translateY(0) scale(1);
   }
 
-  .card .name {
+  .card-photo {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    object-position: center 20%;
+    display: block;
+    filter: brightness(0.85) contrast(1.05);
+    transition: filter 0.3s ease;
+  }
+
+  .card:hover .card-photo {
+    filter: brightness(0.9) contrast(1.1);
+  }
+
+  .card-photo-overlay {
+    position: relative;
+  }
+
+  .card-photo-overlay::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 80px;
+    background: linear-gradient(transparent, rgba(15,12,41,0.8));
+    pointer-events: none;
+  }
+
+  .card-body {
+    padding: 28px 36px 36px;
+    line-height: 2;
+    font-size: 0.92rem;
+    font-weight: 300;
+    white-space: pre-wrap;
+  }
+
+  .card-body .name {
     font-size: 1.15rem;
     font-weight: 600;
     color: rgba(255,255,255,0.9);
@@ -154,7 +176,7 @@
     letter-spacing: 0.05em;
   }
 
-  .card .name span {
+  .card-body .name span {
     font-weight: 300;
     font-size: 0.85rem;
     color: rgba(255,255,255,0.4);
@@ -170,14 +192,14 @@
     letter-spacing: 0.05em;
   }
 
-  /* Scrollbar */
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
 
   @media (max-width: 480px) {
-    body { padding: 30px 16px; }
-    .card { padding: 24px; font-size: 0.88rem; }
+    body { padding: 30px 16px 60px; }
+    .card-body { padding: 20px 24px 28px; font-size: 0.88rem; }
+    .card-photo { height: 220px; }
     h1 { font-size: 1.3rem; }
   }
 </style>
@@ -196,8 +218,11 @@
 <div id="cardArea"></div>
 
 <script>
-const messages = {
-  "ちばさん": `たくさんのバンドで本当にお世話になりました。千葉さんのギタボでもキーボでも、後ろでドラムを叩かせてもらえたのは光栄です。ホロライブとかで下手なキーボやって迷惑かけたのも良い思い出ということで……笑
+const members = [
+  {
+    name: "ちばさん",
+    img: "img/chiba.jpg",
+    msg: `たくさんのバンドで本当にお世話になりました。千葉さんのギタボでもキーボでも、後ろでドラムを叩かせてもらえたのは光栄です。ホロライブとかで下手なキーボやって迷惑かけたのも良い思い出ということで……笑
 
 他の1個上の代の方は、正直先輩というより仲の良い友達感が否めなかったんですが、千葉さんだけはずっと自分の中で「先輩」でした。怖いしね〜。
 
@@ -205,17 +230,23 @@ const messages = {
 
 2年前のSuperflyは本当に悔しかった。自分から誘っておいて、正直自分の演奏が酷くて、千葉さんを初め組んでいただいた先輩方に申し訳なかったし、当時は合わせる顔がないなと思ってました。そんな中でキュウソを組んでリベンジの機会をもらえたこと、本当にありがたかったです。絶対に去年の二の舞にはしない、千葉さんの足を引っ張らない——その一心で頑張ってました。定演上位で通せて（ダントツ1位だと思ってる）嬉しかった反面、凄くホッとしたのを覚えています。
 
-来年以降スイスにいるらしいですが、そんなの知らないのでしれっとバンドやりましょう。`,
-
-  "ゆうかさん": `振り返ると、思ったよりバンド組んでないんですよね〜。ただキュウソや赤い公園みたいな大舞台で一緒にやれていて、バンドの数以上に長い時間スタ練を重ねてきたから、密度は相当なものでした。
+来年以降スイスにいるらしいですが、そんなの知らないのでしれっとバンドやりましょう。`
+  },
+  {
+    name: "ゆうかさん",
+    img: "img/yuuka.jpg",
+    msg: `振り返ると、思ったよりバンド組んでないんですよね〜。ただキュウソや赤い公園みたいな大舞台で一緒にやれていて、バンドの数以上に長い時間スタ練を重ねてきたから、密度は相当なものでした。
 
 自分は割と、上手なベーシストと組んでも上手くハマる人とハマり切らない人がいるんですが、ゆうかさんは上手いだけじゃなくて、一緒にやってて凄く気持ちいいベースでした。ノリ感が似てるとかなんすかね。知らんけど。
 
 自分は積極的に人と絡むタイプではないけれど、ゆうかさんの巻き込み力とか、自分が居たらちゃんと気づいてくれるところとか、そういう何気ないことにいろいろ救われてた気がしています。何を言っても受け止めてくれる度量の広さ？笑　みたいなものがあって、芸音の中で一番本心を話せる人だなぁと思ってます。
 
-初期から情報学部ってことでなんとなく話して、なんとなく仲良くなった気がしますが、自分にとっては一番安心できるベーシストです。卒業おめでとうございます！！`,
-
-  "二村さん": `卒業おめでとうございます！！初期からいろんなバンドでお世話になりました。
+初期から情報学部ってことでなんとなく話して、なんとなく仲良くなった気がしますが、自分にとっては一番安心できるベーシストです。卒業おめでとうございます！！`
+  },
+  {
+    name: "二村さん",
+    img: "img/nimura.jpg",
+    msg: `卒業おめでとうございます！！初期からいろんなバンドでお世話になりました。
 
 やっぱり特にオーラルは、自分にとってめちゃくちゃ挑戦でした。あれをやりきれるかどうかで、ドラムを続けるかどうかすら変わっていたような気がします。そんなオーラルを一緒にやれて、今回の追いコンでさらに進化させてやれたこと、本当に感謝しています。
 
@@ -223,24 +254,28 @@ const messages = {
 
 ただ、そんな中でみちゃぱに誘っていただいて、気づいたら自分もその階層に引っ張り上げられていました（まだ全然釣り上げられ中ですが）。今まで全く考えていなかったことで、大変な反面、自分の手でみんなと一つの曲を作り上げてライブをするのが今とても楽しいです。マジで感謝してます。
 
-一旦卒業で寂しくなりますが、今後ともよろです！`,
-
-  "しきさん": `オーラル良かったねぇ。キュウソも良かったっすねぇ。MCを聞いたときに、しきさんがオーラルにそんな思いを持っていたとはつゆ知らず、なんとなくリベンジ・進化という形で向き合っていた自分が、やっとあれは追いコンの演奏だったんだと自覚できた気がします。
+一旦卒業で寂しくなりますが、今後ともよろです！`
+  },
+  {
+    name: "しきさん",
+    img: "img/shiki.jpg",
+    msg: `オーラル良かったねぇ。キュウソも良かったっすねぇ。MCを聞いたときに、しきさんがオーラルにそんな思いを持っていたとはつゆ知らず、なんとなくリベンジ・進化という形で向き合っていた自分が、やっとあれは追いコンの演奏だったんだと自覚できた気がします。
 
 自分にとって転機になったバンドがいくつかあって、その中でオーラル・ブルエン・キュウソと、しきさんに歌ってもらっているものがめちゃくちゃ多い。芸音で頑張ろうと決断したきっかけ、初心者から一歩上のステージに明確に上がる努力をしたもの、全力を尽くして自分が持てる最大のライブを求めたもの——それぞれが本当に自分を形作ってきたバンドです。それらを今こうして振り返れるのは、組んでもらったバンドメンバー、特に歌ってくれたしきさんのおかげだと思っています。
 
 安直かもしれないけど、やっぱりライブの中で一番目立って、一番上手くあってほしいのはボーカルだと思っていて。しきさんはその期待を下回ることなど決してなく、毎度超えてきて、どんどんライブが上手くなっていく。本当に尊敬するボーカルだなぁと常々思っています。そんなしきさんが前にいたからこそ、自分はライブを楽しめたし、観客に向き合えた。（ドラムで向き合ってるとか、ボーカルからしたら甘えかよって言われそうすけど笑）
 
 まだ1年ありますもんね。組めたら嬉しいし、組めなくたってしきさんのライブはとても楽しみに観に行きます！とりあえずお疲れ様です！！`
-};
+  }
+];
 
 const select = document.getElementById('nameSelect');
 const cardArea = document.getElementById('cardArea');
 
-Object.keys(messages).forEach(name => {
+members.forEach(m => {
   const opt = document.createElement('option');
-  opt.value = name;
-  opt.textContent = name;
+  opt.value = m.name;
+  opt.textContent = m.name;
   select.appendChild(opt);
 });
 
@@ -250,8 +285,11 @@ select.addEventListener('change', () => {
     cardArea.innerHTML = '<p class="placeholder">▽ 名前を選んでね</p>';
     return;
   }
-  const msg = messages[name];
-  cardArea.innerHTML = `<div class="card"><div class="name">${name} <span>へ</span></div>${msg}</div>`;
+  const m = members.find(x => x.name === name);
+  cardArea.innerHTML = `<div class="card">
+    <div class="card-photo-overlay"><img class="card-photo" src="${m.img}" alt="${m.name}"></div>
+    <div class="card-body"><div class="name">${m.name} <span>へ</span></div>${m.msg}</div>
+  </div>`;
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       cardArea.querySelector('.card').classList.add('show');
