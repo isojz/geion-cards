@@ -192,6 +192,57 @@
     letter-spacing: 0.05em;
   }
 
+  /* BGM button */
+  .bgm-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.7);
+    font-size: 1.3rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 10;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  }
+  .bgm-btn:hover {
+    background: rgba(255,255,255,0.18);
+    border-color: rgba(255,255,255,0.3);
+    transform: scale(1.08);
+  }
+  .bgm-btn.playing {
+    background: rgba(123,104,238,0.25);
+    border-color: rgba(123,104,238,0.4);
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
+    50% { box-shadow: 0 4px 24px rgba(123,104,238,0.4); }
+  }
+  .bgm-label {
+    position: fixed;
+    bottom: 82px;
+    right: 16px;
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.3);
+    z-index: 10;
+    text-align: right;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .bgm-label.show { opacity: 1; }
+  #ytPlayer { display: none; }
+
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
@@ -216,6 +267,10 @@
 </div>
 
 <div id="cardArea"></div>
+
+<button class="bgm-btn" id="bgmBtn" title="BGM ON/OFF">♪</button>
+<div class="bgm-label" id="bgmLabel">キュウソネコカミ - THE BAND</div>
+<div id="ytPlayer"></div>
 
 <script>
 const members = [
@@ -298,6 +353,57 @@ select.addEventListener('change', () => {
 });
 
 cardArea.innerHTML = '<p class="placeholder">▽ 名前を選んでね</p>';
+
+// BGM (YouTube IFrame API)
+let player;
+let isPlaying = false;
+const bgmBtn = document.getElementById('bgmBtn');
+const bgmLabel = document.getElementById('bgmLabel');
+
+const tag = document.createElement('script');
+tag.src = 'https://www.youtube.com/iframe_api';
+document.head.appendChild(tag);
+
+window.onYouTubeIframeAPIReady = function() {
+  player = new YT.Player('ytPlayer', {
+    height: '0',
+    width: '0',
+    videoId: 'cP-ycyKl888',
+    playerVars: { autoplay: 0, loop: 1, playlist: 'cP-ycyKl888' },
+    events: {
+      onReady: () => {},
+      onStateChange: (e) => {
+        if (e.data === YT.PlayerState.ENDED) {
+          player.playVideo();
+        }
+      }
+    }
+  });
+};
+
+bgmBtn.addEventListener('click', () => {
+  if (!player || !player.playVideo) return;
+  if (isPlaying) {
+    player.pauseVideo();
+    bgmBtn.textContent = '♪';
+    bgmBtn.classList.remove('playing');
+    bgmLabel.classList.remove('show');
+  } else {
+    player.playVideo();
+    bgmBtn.textContent = '⏸';
+    bgmBtn.classList.add('playing');
+    bgmLabel.classList.add('show');
+    setTimeout(() => bgmLabel.classList.remove('show'), 3000);
+  }
+  isPlaying = !isPlaying;
+});
+
+bgmBtn.addEventListener('mouseenter', () => {
+  if (isPlaying) bgmLabel.classList.add('show');
+});
+bgmBtn.addEventListener('mouseleave', () => {
+  bgmLabel.classList.remove('show');
+});
 </script>
 </body>
 </html>
