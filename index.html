@@ -192,6 +192,34 @@
     letter-spacing: 0.05em;
   }
 
+  /* Band card (no photo, special header) */
+  .card-band-header {
+    padding: 32px 36px 0;
+    text-align: center;
+  }
+  .card-band-header .band-emoji {
+    font-size: 2rem;
+    margin-bottom: 12px;
+  }
+  .card-band-header .band-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+  .card-band-header .band-sub {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.3);
+    margin-bottom: 20px;
+  }
+  .card-band-header .band-divider {
+    width: 40px;
+    height: 1px;
+    background: rgba(255,255,255,0.12);
+    margin: 0 auto;
+  }
+
   /* BGM button */
   .bgm-btn {
     position: fixed;
@@ -262,7 +290,7 @@
 
 <div class="select-container">
   <select id="nameSelect">
-    <option value="">名前を選んでください</option>
+    <option value="band">みんなへ</option>
   </select>
 </div>
 
@@ -273,6 +301,26 @@
 <div id="ytPlayer"></div>
 
 <script>
+const bandMsg = `卒業（卒業？）おめでとうございます！！各人本当にいろんなこと・いろんなバンドでお世話になりました。やっぱり自分の中で一番印象的なのはキュウソです。今までやってきたどのバンドよりも本気で、楽しく、上を目指してやれたのはこのメンバーだったからかなと思います。自分だけ学年も違うし、他にも上手いドラマーなんていっぱいいるのに自分を誘ってくれて嬉しかった。正直自分は人と過剰に仲良くしようとすると疲れてしまう、根本的な一匹狼気質があると思っていて、そんな関わりかたをしてきた自分が参加できたことが嬉しかったし、スタ練～ライブ、飲み会とかもすごく心地の良い時間でした。ライブ中だって誰よりも楽しんだ自信があるし、誰よりも4人の凄くかっこいい背中を見てきました。真隣に立ちながらのライブはなかなか難しくてできてないけど、全力で前に向かって演じる姿は目に焼き付いてます。
+ただ正直、そんな素敵な方たちが卒業って聞いても全然悲しくない自分がいます。薄情なのかなって思ったんすけど、多分自分は一緒にいた時間を全力で楽しめてたから、後悔がないんだと思います。悲しむ余地がないくらい、ちゃんと楽しかった。全力でやり切った追いコンだった。だから何も悲しくない代わりに感謝の気持ちで一杯です。本当にありがとうございました。`;
+
+function renderBandCard() {
+  cardArea.innerHTML = `<div class="card">
+    <div class="card-band-header">
+      <div class="band-emoji">🎸</div>
+      <div class="band-title">ちばさん・ゆうかさん・二村さん・しきさん</div>
+      <div class="band-sub">キュウソネコカミ コピバン</div>
+      <div class="band-divider"></div>
+    </div>
+    <div class="card-body">${bandMsg}</div>
+  </div>`;
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      cardArea.querySelector('.card').classList.add('show');
+    });
+  });
+}
+
 const members = [
   {
     name: "ちばさん",
@@ -336,11 +384,12 @@ members.forEach(m => {
 
 select.addEventListener('change', () => {
   const name = select.value;
-  if (!name) {
-    cardArea.innerHTML = '<p class="placeholder">▽ 名前を選んでね</p>';
+  if (name === 'band') {
+    renderBandCard();
     return;
   }
   const m = members.find(x => x.name === name);
+  if (!m) return;
   cardArea.innerHTML = `<div class="card">
     <div class="card-photo-overlay"><img class="card-photo" src="${m.img}" alt="${m.name}"></div>
     <div class="card-body"><div class="name">${m.name} <span>へ</span></div>${m.msg}</div>
@@ -352,7 +401,8 @@ select.addEventListener('change', () => {
   });
 });
 
-cardArea.innerHTML = '<p class="placeholder">▽ 名前を選んでね</p>';
+// Show band message on load
+renderBandCard();
 
 // BGM (YouTube IFrame API)
 let player;
