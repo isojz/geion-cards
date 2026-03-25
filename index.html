@@ -317,13 +317,8 @@ const bandMsg = `卒業（卒業？）おめでとうございます！！
 
 function renderBandCard() {
   cardArea.innerHTML = `<div class="card">
-    <div class="card-band-header">
-      <div class="band-emoji">🎸</div>
-      <div class="band-title">ちばさん・ゆうかさん・二村さん・しきさん</div>
-      <div class="band-sub"></div>
-      <div class="band-divider"></div>
-    </div>
-    <div class="card-body">${bandMsg}</div>
+    <div class="card-photo-overlay"><img class="card-photo" src="img/band.jpg" alt="みんな"></div>
+    <div class="card-body"><div class="name">ちばさん・ゆうかさん・二村さん・しきさん <span>へ</span></div>${bandMsg}</div>
   </div>`;
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
