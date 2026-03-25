@@ -5,78 +5,187 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>メッセージカード</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;600&display=swap');
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
+
   body {
-    font-family: 'Helvetica Neue', 'Hiragino Sans', 'Meiryo', sans-serif;
-    background: #1a1a2e;
-    color: #e0e0e0;
+    font-family: 'Noto Sans JP', 'Helvetica Neue', sans-serif;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 40px 20px;
+    padding: 50px 20px;
+    background: #0f0c29;
+    background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+    color: #e8e8f0;
+    position: relative;
+    overflow-x: hidden;
   }
+
+  /* Ambient floating orbs */
+  body::before, body::after {
+    content: '';
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.3;
+    z-index: 0;
+    pointer-events: none;
+  }
+  body::before {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, #7b68ee, transparent);
+    top: -100px; left: -100px;
+    animation: float1 20s ease-in-out infinite;
+  }
+  body::after {
+    width: 350px; height: 350px;
+    background: radial-gradient(circle, #e040fb, transparent);
+    bottom: -50px; right: -80px;
+    animation: float2 18s ease-in-out infinite;
+  }
+
+  @keyframes float1 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(60px, 40px); }
+  }
+  @keyframes float2 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-50px, -30px); }
+  }
+
   h1 {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     font-weight: 300;
-    letter-spacing: 0.1em;
-    margin-bottom: 30px;
-    color: #a0a0c0;
+    letter-spacing: 0.15em;
+    margin-bottom: 8px;
+    color: rgba(255,255,255,0.85);
+    z-index: 1;
   }
+
+  .subtitle {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 36px;
+    letter-spacing: 0.05em;
+    z-index: 1;
+  }
+
+  /* Glass select */
   .select-container {
     margin-bottom: 40px;
+    z-index: 1;
   }
+
   select {
     appearance: none;
-    background: #16213e;
-    color: #e0e0e0;
-    border: 1px solid #3a3a5c;
-    border-radius: 8px;
-    padding: 12px 40px 12px 16px;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    color: #e8e8f0;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 14px 44px 14px 20px;
     font-size: 1rem;
+    font-family: inherit;
     cursor: pointer;
     outline: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a0a0c0' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");
+    transition: all 0.3s ease;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.5)' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 14px center;
+    background-position: right 16px center;
   }
-  select:hover { border-color: #5a5a8c; }
-  .card {
-    max-width: 600px;
+  select:hover {
+    border-color: rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.12);
+  }
+  select:focus {
+    border-color: rgba(123,104,238,0.6);
+    box-shadow: 0 0 20px rgba(123,104,238,0.15);
+  }
+
+  /* Glass card */
+  #cardArea {
     width: 100%;
-    background: #16213e;
-    border-radius: 12px;
-    padding: 32px;
-    line-height: 1.9;
-    font-size: 0.95rem;
-    opacity: 0;
-    transform: translateY(10px);
-    transition: opacity 0.4s ease, transform 0.4s ease;
-    white-space: pre-wrap;
+    max-width: 640px;
+    z-index: 1;
   }
+
+  .card {
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 36px;
+    line-height: 2;
+    font-size: 0.92rem;
+    font-weight: 300;
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    white-space: pre-wrap;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  }
+
   .card.show {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
+
   .card .name {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     font-weight: 600;
-    color: #c0c0e0;
-    margin-bottom: 16px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid #2a2a4c;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    letter-spacing: 0.05em;
   }
+
+  .card .name span {
+    font-weight: 300;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.4);
+    margin-left: 8px;
+  }
+
   .placeholder {
-    color: #5a5a7c;
-    font-size: 0.9rem;
+    color: rgba(255,255,255,0.25);
+    font-size: 0.85rem;
     text-align: center;
-    margin-top: 60px;
+    margin-top: 80px;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+  @media (max-width: 480px) {
+    body { padding: 30px 16px; }
+    .card { padding: 24px; font-size: 0.88rem; }
+    h1 { font-size: 1.3rem; }
   }
 </style>
 </head>
 <body>
 
 <h1>メッセージカード</h1>
+<p class="subtitle">芸音 追いコン 2026</p>
 
 <div class="select-container">
   <select id="nameSelect">
@@ -88,51 +197,6 @@
 
 <script>
 const messages = {
-  "おーぞら": `4年間お疲れ様！なんやかんや追いコンたくさん出てくれてて嬉しいです^^
-やっぱり自分は秋山が一番記憶に残ってるし、その後も定期的にライブで活躍してる姿みれて、都度安心してた。今後もしれっとライブ出てな！（一緒に出ような！）`,
-
-  "まこちゃん": `卒業おめでとう！同期です。`,
-
-  "くぼゆうか": `4年間お疲れ様！ゆうかさんは入ってきた時からマジでドラム上手で、年下ながらずっと憧れて聞いてました！合宿のUNISONの衝撃は今でも覚えてる。上手ながらめちゃ謙虚で追いつけねぇなぁと今でも思っております。今後もファイトです！！！`,
-
-  "岡田": `卒業おめでとう！！正直後2年くらい学部にいるんじゃないかと思ってた....
-岡田のドラムは音はもちろん、見てて気持ち良くて、ライブに行く価値のある演奏だなぁといつも思っております。
-今後どうするか知らないけど、とりあえずガンバ！`,
-
-  "まお": `aooo組んでくれてありがとう！
-昔から色んなことやってて忙しそうな中、少ないけど何度か組めて楽しかったです^^
-音楽を媒体として、色んなこと（留学生との交流とか）に活かしてる姿はとても素敵だなぁって思ってます！
-卒業おめでとう！！`,
-
-  "ゆいな": `卒業おめでとう！追いコンでやっぱボーカル力の鬼だなぁと痛感しました。映像でいろいろ見返すたびに、一人だけ段違いで上手く聞こえます。
-定期ライブでその声が聞こえないと思うと寂しいけれど、しれっとOBとかに出るの期待してます`,
-
-  "さらさ": `卒業おめでとう！！今年の追いコンはさらさちゃんの羊を聞いて、やっと実感が湧き始めました。凄く心地の良い歌声で、いつもちゃんと楽しみに聞いてて、今後簡単に聞けないと思うとかなり残念です.......
-またOBとかで聞けるのを楽しみに待ってます^^`,
-
-  "とやま": `卒業おめでとう！！ビジュの進化が止まらなくて良いよね～
-かなり忙しそうだけど、院でもライブでツインペ踏みまくってくれるのを期待してます`,
-
-  "せきや": `暴れるギタボを探すときに、択が関谷しかなくて打首やらtotalfatやらキツイの誘ってすんません
-でも一緒にやれてマジで楽しかったし、その雰囲気を自分のものにできる関谷のギタボが大好きです
-4年間お疲れ様！！`,
-
-  "服部さん": `服部さんの歌は他のボーカルに比べて、芯まで届く感じがあって凄く生で聞く価値がある物だと思っています！
-ボーカルのこだわりを聞いて、努力の上で成り立っているのを知ってから凄く尊敬してます
-ご卒業おめでとうございます！`,
-
-  "ゆうま": `卒業おめでとう！ゆうまの作るベースの音すごく好きです
-壁谷と爆音で両隣からなってるのを聞く時、本当に楽しくなってくる
-いつかどっかにツーリングいきましょ`,
-
-  "モモハ": `卒業おめでとう！めちゃ組んだわけでもないし、自分は積極的な方でもないのに、なんか居たら喋ってくれて地味に嬉しかったっす
-先輩とばっか組んでるイメージあるからちょっと怖いよね～
-今後もしれっと仲良くしてくださいな`,
-
-  "ryorand": `5年くらい村松さんのドラム聞いて、とんでもなく上達してるなって感じます。
-小手先じゃなくて基礎から積み上げられたドラムって感じで真面目な人柄？が出てるのかなぁと思っております
-卒業おめでとうございます！！`,
-
   "ちばさん": `たくさんのバンドで本当にお世話になりました。千葉さんのギタボでもキーボでも、後ろでドラムを叩かせてもらえたのは光栄です。ホロライブとかで下手なキーボやって迷惑かけたのも良い思い出ということで……笑
 
 他の1個上の代の方は、正直先輩というより仲の良い友達感が否めなかったんですが、千葉さんだけはずっと自分の中で「先輩」でした。怖いしね〜。
@@ -173,25 +237,21 @@ const messages = {
 const select = document.getElementById('nameSelect');
 const cardArea = document.getElementById('cardArea');
 
-// Populate dropdown (selected members only)
-const showOnly = ["ちばさん", "ゆうかさん", "二村さん", "しきさん"];
-showOnly.forEach(name => {
-  if (messages[name]) {
-    const opt = document.createElement('option');
-    opt.value = name;
-    opt.textContent = name;
-    select.appendChild(opt);
-  }
+Object.keys(messages).forEach(name => {
+  const opt = document.createElement('option');
+  opt.value = name;
+  opt.textContent = name;
+  select.appendChild(opt);
 });
 
 select.addEventListener('change', () => {
   const name = select.value;
   if (!name) {
-    cardArea.innerHTML = '<p class="placeholder">名前を選んでね</p>';
+    cardArea.innerHTML = '<p class="placeholder">▽ 名前を選んでね</p>';
     return;
   }
   const msg = messages[name];
-  cardArea.innerHTML = `<div class="card"><div class="name">${name}へ</div>${msg}</div>`;
+  cardArea.innerHTML = `<div class="card"><div class="name">${name} <span>へ</span></div>${msg}</div>`;
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       cardArea.querySelector('.card').classList.add('show');
@@ -199,7 +259,7 @@ select.addEventListener('change', () => {
   });
 });
 
-cardArea.innerHTML = '<p class="placeholder">名前を選んでね</p>';
+cardArea.innerHTML = '<p class="placeholder">▽ 名前を選んでね</p>';
 </script>
 </body>
 </html>
