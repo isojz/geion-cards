@@ -371,7 +371,14 @@ window.onYouTubeIframeAPIReady = function() {
     videoId: 'cP-ycyKl888',
     playerVars: { autoplay: 0, loop: 1, playlist: 'cP-ycyKl888' },
     events: {
-      onReady: () => {},
+      onReady: (e) => {
+        e.target.playVideo();
+        isPlaying = true;
+        bgmBtn.textContent = '⏸';
+        bgmBtn.classList.add('playing');
+        bgmLabel.classList.add('show');
+        setTimeout(() => bgmLabel.classList.remove('show'), 3000);
+      },
       onStateChange: (e) => {
         if (e.data === YT.PlayerState.ENDED) {
           player.playVideo();
